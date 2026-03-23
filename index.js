@@ -52,15 +52,14 @@ app.get('/groups', async (req,res) => {
   if(!req.session.authenticated)
   {
     res.redirect('/')
+  } else {
+    const user_groups = await groups.getGroups(req.session.user_id)
+    const user_groups_list = user_groups[0]
+  
+    res.render('groups', {groups: user_groups_list})
+    // res.redirect('/')
   }
 
-  const user_groups = await groups.getGroups(req.session.user_id)
-  const user_groups_list = user_groups[0]
-  console.log(user_groups_list)
-  console.log(user_groups);
-
-  res.render('groups', {groups: user_groups_list})
-  // res.redirect('/')
 })
 
 app.post('/newGroup/:group_name', (req,res) => {
@@ -68,9 +67,17 @@ app.post('/newGroup/:group_name', (req,res) => {
 })
 
 //Needs group id as a query parameter
-app.get('/group/:group_id', (req,res) => {
+app.get('/group/:group_id/:room_user_id', async (req,res) => {
   let groupID = req.params.group_id
+  const room_user_id = req.params.room_user_id
   //displays all of the texts inside a group, reactions to those messages, and text area to send messages
+  const messages = await groups.getMessagesInGroup(groupID)
+  const message_list = messages[0]
+  console.log(message_list)
+  console.log(messages)
+  console.log(`inside individual group, room_user_id = ${room_user_id}`)
+
+  res.render('group', {messages: message_list, userid: req.session.user_id, group_id: groupID, room_user_id: room_user_id})
 })
 
 app.post('/group/invite/:person_name/:group_id', (req,res) => {
@@ -81,8 +88,15 @@ app.post('/message/:message_id/user/:user_id/emoji/:emoji_id', (req,res) => {
   //reacts to a message
 })
 
-app.post('/newMessage/user/:user_id', (req,res) => {
-  var message = req.body.message
+app.post('/group/:group_id/newMessage/room_user_id/:room_user_id', (req,res) => {
+  const message = req.body.message;
+  const room_user_id = req.params.room_user_id;
+  const group_id = req.params.group_id;
+  console.log(room_user_id)
+  console.log(group_id)
+  const result = groups.addMessageToGroup(message, room_user_id)
+  console.log(message)
+  res.redirect('/group/' + group_id + "/" + room_user_id)
 })
 
 app.get('/sql', (req,res) => {

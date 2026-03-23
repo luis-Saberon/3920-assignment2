@@ -1,0 +1,11 @@
+<%- include("templates/header") %> 
+<table>
+  <% for(var i = 0; i < groups.length; i++) { %>
+    <tr>
+      <td><%= groups[i].room_id %></td>
+      <td><a href="group/<%= groups[i].room_id %>"><%= groups[i].name %></a></td>
+      <td><%= groups[i].start_datetime %></td>
+    </tr>
+  <% } %>
+</table>
+<%- include("templates/footer") %> 

@@ -33,10 +33,19 @@ async function getAllUsers() {
   }
 }
 
+async function getUserId(username) {
+  try {
+    const results = await database.execute("SELECT user_id FROM user WHERE username = ?",[username])
+    return results
+  } catch (err) {
+    console.log(err);
+    return false
+  }
+}
 async function getUser(username) {
   try {
-    
-    const results = await database.execute("SELECT username, password FROM user WHERE username = ?",[username])
+    const results = await database.execute("SELECT user_id, password_hash FROM user WHERE username = ?",[username])
+    console.log(results)
     return results
   } catch (err) {
     console.log(err);
@@ -55,4 +64,4 @@ async function deleteUsers() {
   }
 }
 
-module.exports = {createUser, getUser, getAllUsers, deleteUsers};
+module.exports = {createUser, getUser, getAllUsers, deleteUsers, getUserId};

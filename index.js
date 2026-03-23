@@ -10,6 +10,7 @@ const saltRounds = 12;
 
 const database = include('databaseconnection');
 const users = include('users');
+const groups = include('groups');
 const port = process.env.PORT || 3000;
 
 const mongodb_user = process.env.MONGO_USERNAME;
@@ -39,12 +40,50 @@ app.get('/', (req,res) => {
 
   if(req.session.authenticated)
   {
-    res.render('home')
+    res.render('home', {name : req.session.name})
   } else
   {
     res.render('index')
   }
 });
+
+app.get('/groups', async (req,res) => {
+  //get all the groups and display them in a list
+  if(!req.session.authenticated)
+  {
+    res.redirect('/')
+  }
+
+  const user_groups = await groups.getGroups(req.session.user_id)
+  const user_groups_list = user_groups[0]
+  console.log(user_groups_list)
+  console.log(user_groups);
+
+  res.render('groups', {groups: user_groups_list})
+  // res.redirect('/')
+})
+
+app.post('/newGroup/:group_name', (req,res) => {
+  //create a new group based on group name, and add person who made group to group.
+})
+
+//Needs group id as a query parameter
+app.get('/group/:group_id', (req,res) => {
+  let groupID = req.params.group_id
+  //displays all of the texts inside a group, reactions to those messages, and text area to send messages
+})
+
+app.post('/group/invite/:person_name/:group_id', (req,res) => {
+  //add a person to the group. 
+})
+
+app.post('/message/:message_id/user/:user_id/emoji/:emoji_id', (req,res) => {
+  //reacts to a message
+})
+
+app.post('/newMessage/user/:user_id', (req,res) => {
+  var message = req.body.message
+})
 
 app.get('/sql', (req,res) => {
   printMySQLVersion()
@@ -154,7 +193,7 @@ app.post('/signupPost', (req,res) => {
     req.session.authenticated = true
     req.session.name = username
     req.session.cookie.maxAge = expireTime
-    res.redirect('/members')
+    res.redirect('/')
   } else {
     res.send('error');
   }
@@ -179,6 +218,27 @@ app.post('/loginPost', async (req,res) => {
   {
     console.log('somethings gone wrong')
     res.redirect('/login?databaseError=true')
+  }else {
+    if(result[0].length != 1)
+    {
+      res.redirect('/login?userNotFound=true')
+      console.log('result[0].lenght is the problem')
+    }
+
+    if(bcrypt.compareSync(password, result[0][0].password_hash))
+    {
+      req.session.authenticated = true;
+      req.session.name = username;
+      req.session.cookie.maxAge = expireTime;
+      req.session.email = result[0][0].email;
+      const user_id = await users.getUserId(username)
+      req.session.user_id = user_id[0][0].user_id
+      
+      res.redirect('/')
+    } else {
+      console.log('bcrypt compare password is the problem')
+      res.redirect("/login?userNotFound=true")
+    }
   }
 
 })

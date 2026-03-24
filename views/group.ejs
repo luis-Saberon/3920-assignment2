@@ -1,18 +1,28 @@
 <%- include("templates/header") %> 
 <table>
-   <% for(var i = 0; i < messages.length; i++) { %>
+   <% for(var i = 0; i < seen_messages.length; i++) { %>
     <tr>
-      <td><%= messages[i].username %></td>
-      <td><%= messages[i].sent_datetime %></td>
-      <td><%= messages[i].message_id %></td>
-      <td><%= messages[i].text %></td>
+      <td>Seen message: </td>
+      <td><%= seen_messages[i].username %></td>
+      <td><%= seen_messages[i].sent_datetime %></td>
+      <td><%= seen_messages[i].message_id %></td>
+      <td><%= seen_messages[i].text %></td>
+    </tr>  
+    <% } %>
+    <tr><td>unseen messages</td></tr>
+    <% for(var i = 0; i < unseen_messages.length; i++) { %>
+    <tr>
+      <td>Unseen message:</td>
+      <td><%= unseen_messages[i].username %></td>
+      <td><%= unseen_messages[i].sent_datetime %></td>
+      <td><%= unseen_messages[i].message_id %></td>
+      <td><%= unseen_messages[i].text %></td>
     </tr>  
     <% } %>
 </table>
 
 <form action="newMessage/room_user_id/<%= room_user_id %>" method="post">
-  <textarea name="message" rows="10" cols="10" placeholder="Send a text to the group!" >
-  </textarea>
+  <textarea name="message" rows="10" cols="10" placeholder="Send a text to the group!" ></textarea>
   <button>Submit</button>
 </form>
 <%- include("templates/footer") %> 

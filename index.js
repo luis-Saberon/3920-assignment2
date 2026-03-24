@@ -66,18 +66,30 @@ app.post('/newGroup/:group_name', (req,res) => {
   //create a new group based on group name, and add person who made group to group.
 })
 
-//Needs group id as a query parameter
+//displays all of the texts inside a group, reactions to those messages, and text area to send messages
 app.get('/group/:group_id/:room_user_id', async (req,res) => {
-  let groupID = req.params.group_id
+  let group_id = req.params.group_id
   const room_user_id = req.params.room_user_id
-  //displays all of the texts inside a group, reactions to those messages, and text area to send messages
-  const messages = await groups.getMessagesInGroup(groupID)
+  const messages = await groups.getMessagesInGroup(group_id) //have a divider between seen messages and unseen messages (where message_id is greater than last seen message id)
   const message_list = messages[0]
-  console.log(message_list)
-  console.log(messages)
-  console.log(`inside individual group, room_user_id = ${room_user_id}`)
+  const last_seen_message_id = groups.getLastSeenMessageId(room_user_id)
+  const seen_messages = []
+  const unseen_messages = []
+  for(let i = 0; i < message_list.length; i++)
+  {
+    let message_id = message_list[i].message_id;
+    if (message_id > last_seen_message_id)
+    {
+      unseen_messages.push(message_list[i])
+    } else {
+      seen_messages.push(message_list[i])
+    }
+  }
 
-  res.render('group', {messages: message_list, userid: req.session.user_id, group_id: groupID, room_user_id: room_user_id})
+  const last_message = message_list[message_list.length - 1]
+  const last_message_id = last_message.message_id;
+  groups.updateLastSeenMessage(room_user_id, last_message_id)
+  res.render('group', {unseen_messages: unseen_messages, seen_messages: seen_messages,  userid: req.session.user_id, group_id: group_id, room_user_id: room_user_id})
 })
 
 app.post('/group/invite/:person_name/:group_id', (req,res) => {

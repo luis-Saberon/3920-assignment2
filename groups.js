@@ -13,6 +13,32 @@ async function getGroups(user_id)
   }
 }
 
+
+async function updateLastSeenMessage(room_user_id, message_id) {
+  try {
+    const results = await database.query(
+      'UPDATE room_user SET last_seen_message_id = ? WHERE room_user_id = ?',
+      [message_id, room_user_id]
+    )
+  } catch(err) {
+    console.log(err)
+    return false
+  }
+}
+
+async function getLastSeenMessageId(room_user_id)
+{
+  try {
+    const results = await database.query(
+      'SELECT last_seen_message_id FROM room_user WHERE room_user_id = ?',
+      [room_user_id]
+    )
+
+    return results
+  } catch(err) {
+    return err
+  }
+}
 async function getMessagesInGroup(group_id)
 {
   try {
@@ -54,4 +80,4 @@ async function addPersonToGroup(group_id, user_id)
   }
 }
 
-module.exports = {getGroups, getMessagesInGroup, addMessageToGroup};
+module.exports = {getGroups, getMessagesInGroup, addMessageToGroup, updateLastSeenMessage, getLastSeenMessageId};

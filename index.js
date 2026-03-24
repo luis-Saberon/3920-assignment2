@@ -67,7 +67,6 @@ app.get('/new_group', (req,res) => {
   res.render('createGroup')
 })
 app.post('/new_group', (req,res) => {
-  console.log(req.body.group_name)
   groups.makeGroup(req.session.user_id, req.body.group_name)
   res.redirect('/groups')
 })
@@ -78,11 +77,16 @@ app.get('/group/:group_id/:room_user_id', async (req,res) => {
   {
     res.redirect('/')
   } else {
-
   
-  let group_id = req.params.group_id
-  const room_user_id = req.params.room_user_id
-  const messages = await groups.getMessagesInGroup(group_id) //have a divider between seen messages and unseen messages (where message_id is greater than last seen message id)
+    
+    let group_id = req.params.group_id
+    const room_user_id = req.params.room_user_id
+    allowed = await groups.checkIfUserInGroup(group_id, req.session.user_id)
+    if(!allowed)
+    {
+      res.sendStatus(400);
+    } else {
+    const messages = await groups.getMessagesInGroup(group_id) //have a divider between seen messages and unseen messages (where message_id is greater than last seen message id)
   const message_list = messages[0]
   const seen_messages = []
   const unseen_messages = []
@@ -94,14 +98,10 @@ app.get('/group/:group_id/:room_user_id', async (req,res) => {
     for(let i = 0; i < message_list.length; i++)
     {
       let message_id = message_list[i].message_id;
-      console.log(typeof message_id)
-      console.log(message_id > last_seen_message_id)
       if (message_id > last_seen_message_id)
       {
-        // console.log('adding to unseen list')
         unseen_messages.push(message_list[i])
       } else {
-        // console.log('adding to seen list')
         seen_messages.push(message_list[i])
       }
     }
@@ -111,6 +111,8 @@ app.get('/group/:group_id/:room_user_id', async (req,res) => {
   }
   const emptyRoom = message_list.length == 0
   res.render('group', {unseen_messages: unseen_messages, seen_messages: seen_messages, emptyRoom: emptyRoom, userid: req.session.user_id, group_id: group_id, room_user_id: room_user_id})
+    }
+
 }
 })
 
@@ -215,7 +217,7 @@ function checkRegex(string)
 
   return true
 }
-app.post('/signupPost', (req,res) => {
+app.post('/signupPost', async (req,res) => {
   var username = req.body.username;
   var password = req.body.password;
   var email = req.body.email;
@@ -245,12 +247,14 @@ app.post('/signupPost', (req,res) => {
   var hashedPassword = bcrypt.hashSync(password, saltRounds)
   
 
-  var success = users.createUser({user: username, hashedPassword: hashedPassword, email: email})
+  var success = await users.createUser({user: username, hashedPassword: hashedPassword, email: email})
 
   if(success){
     req.session.authenticated = true
     req.session.name = username
     req.session.cookie.maxAge = expireTime
+    const user_id = await users.getUserId(username)
+    req.session.user_id = user_id[0][0].user_id
     res.redirect('/')
   } else {
     res.send('error');

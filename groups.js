@@ -35,6 +35,26 @@ async function updateLastSeenMessage(room_user_id, message_id) {
   }
 }
 
+async function checkIfUserInGroup(group_id, user_id)
+{
+
+  try{ 
+    const results = await database.query(`
+      SELECT * FROM room_user
+      WHERE user_id = ? AND
+      room_id = ?`,
+    [user_id, group_id])
+    if (results[0].length == 0)
+    {
+      return false
+    }
+    return true
+  } catch(err) {
+    console.log(err)
+    return false
+  }
+}
+
 async function getLastSeenMessageId(room_user_id)
 {
   try {
@@ -77,14 +97,10 @@ async function addMessageToGroup(message, room_user_id)
 async function addPersonToGroup(group_id, user_id)
 {
   try{
-    console.log("INSIDE ADD PERSON TO GROUP")
-    console.log(group_id)
-    console.log(user_id)
     const results = await database.query(
       'INSERT INTO room_user (room_id, user_id) VALUES (?, ?)',
       [group_id, user_id]
     )
-    console.log(results[0])
     return true
   } catch (err) {
     console.log(err)
@@ -99,7 +115,6 @@ async function makeGroup(user_id, group_name)
       'INSERT INTO room (name, start_datetime) VALUES (?, now())',
       [group_name]
     )
-    console.log(result)
     const group_id = result[0].insertId
     await addPersonToGroup(group_id, user_id)
   } catch(err) {
@@ -128,4 +143,4 @@ async function getUsersInGroup(group_id, user_id)
   }
 }
 
-module.exports = {getGroups, getMessagesInGroup, addMessageToGroup, updateLastSeenMessage, getLastSeenMessageId, makeGroup, addPersonToGroup, getUsersInGroup};
+module.exports = {getGroups, getMessagesInGroup, addMessageToGroup, updateLastSeenMessage, getLastSeenMessageId, makeGroup, addPersonToGroup, getUsersInGroup, checkIfUserInGroup};

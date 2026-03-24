@@ -57,7 +57,7 @@ app.get('/groups', async (req,res) => {
   } else {
     const user_groups = await groups.getGroups(req.session.user_id)
     const user_groups_list = user_groups[0]
-  
+    console.log(user_groups_list)
     res.render('groups', {groups: user_groups_list})
     // res.redirect('/')
   }

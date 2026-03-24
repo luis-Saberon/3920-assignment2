@@ -42,7 +42,7 @@ app.get('/', (req,res) => {
 
   if(req.session.authenticated)
   {
-    res.render('home', {name : req.session.name})
+    res.render('home', {name : req.session.name, user_id: req.session.user_id})
   } else
   {
     res.render('index')

@@ -5,7 +5,7 @@ async function getGroups(user_id)
   try {
     const results = await database.query(
       `SELECT r.room_id, r.name, r.start_datetime, ru.room_user_id, mm.message_id, m.sent_datetime
-        FROM USER u INNER JOIN room_user ru ON u.user_id = ru.user_id
+        FROM user u INNER JOIN room_user ru ON u.user_id = ru.user_id
         INNER JOIN room r ON ru.room_id = r.room_id
         left join (SELECT r.room_id, max(m.message_id) AS message_id
         FROM room r
@@ -114,7 +114,7 @@ async function getUsersInGroup(group_id, user_id)
   try{
     const result = await database.query(
       `SELECT u.email, u.username, u.user_id, r.room_id
-      FROM USER u
+      FROM user u
       INNER JOIN room_user ru ON u.user_id = ru.user_id
       INNER JOIN room r ON ru.room_id = r.room_id
       WHERE r.room_id = ?`,

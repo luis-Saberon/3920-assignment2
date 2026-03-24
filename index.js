@@ -146,11 +146,16 @@ app.post('/message/:message_id/user/:user_id/emoji/:emoji_id', (req,res) => {
   //reacts to a message
 })
 
-app.post('/group/:group_id/newMessage/room_user_id/:room_user_id', (req,res) => {
+app.post('/group/:group_id/newMessage/room_user_id/:room_user_id', async (req,res) => {
   const message = req.body.message;
   const room_user_id = req.params.room_user_id;
   const group_id = req.params.group_id;
   const result = groups.addMessageToGroup(message, room_user_id)
+  const messages = await groups.getMessagesInGroup(group_id) //have a divider between seen messages and unseen messages (where message_id is greater than last seen message id)
+  const message_list = messages[0]
+  const last_message = message_list[message_list.length - 1]
+  const last_message_id = last_message.message_id;
+  groups.updateLastSeenMessage(room_user_id, last_message_id)
   res.redirect('/group/' + group_id + "/" + room_user_id)
 })
 

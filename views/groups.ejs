@@ -1,13 +1,23 @@
 <%- include("templates/header") %> 
 <table>
+  <tr>
+    <td>Room id</td>
+    <td>Name</td>
+    <td>Start datetime</td>
+    <td>Last message sent datetime</td>
+  </tr>
   <% for(var i = 0; i < groups.length; i++) { %>
     <tr>
-      <td><%= groups[i].room_id %></td>
+      <td> <%= groups[i].room_id %></td>
       <td><a href="group/<%= groups[i].room_id %>/<%= groups[i].room_user_id %>"><%= groups[i].name %></a></td>
       <td><%= groups[i].start_datetime %></td>
+      <% if(!groups[i].sent_datetime) { %>
+        <td>No messages sent yet!</td>
+      <% } %>
+      <td><%= groups[i].sent_datetime %></td>
     </tr>
   <% } %>
 </table>
-<p>You are currently in 2 groups</p>
+<p>You are currently in <%= groups.length %> groups</p>
 <a href="new_group"> Make a new group</a>
 <%- include("templates/footer") %> 

@@ -4,7 +4,16 @@ async function getGroups(user_id)
 {
   try {
     const results = await database.query(
-      'SELECT r.room_id, r.name, r.start_datetime, ru.room_user_id FROM USER u INNER JOIN room_user ru ON u.user_id = ru.user_id INNER JOIN room r ON ru.room_id = r.room_id WHERE u.user_id = ?',
+      `SELECT r.room_id, r.name, r.start_datetime, ru.room_user_id, mm.message_id, m.sent_datetime
+        FROM USER u INNER JOIN room_user ru ON u.user_id = ru.user_id
+        INNER JOIN room r ON ru.room_id = r.room_id
+        left join (SELECT r.room_id, max(m.message_id) AS message_id
+        FROM room r
+        INNER JOIN room_user ru ON r.room_id = ru.room_id
+        INNER JOIN message m ON ru.room_user_id = m.room_user_id
+        GROUP BY r.room_id
+       ) mm ON mm.room_id = r.room_id
+       LEFT JOIN message m ON mm.message_id = m.message_id WHERE u.user_id = ?`,
       [user_id])
     return results
   } catch(err) {
@@ -68,6 +77,9 @@ async function addMessageToGroup(message, room_user_id)
 async function addPersonToGroup(group_id, user_id)
 {
   try{
+    console.log("INSIDE ADD PERSON TO GROUP")
+    console.log(group_id)
+    console.log(user_id)
     const results = await database.query(
       'INSERT INTO room_user (room_id, user_id) VALUES (?, ?)',
       [group_id, user_id]

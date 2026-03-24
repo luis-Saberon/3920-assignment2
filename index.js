@@ -105,7 +105,12 @@ app.get('/group/:group_id/:room_user_id', async (req,res) => {
   res.render('group', {unseen_messages: unseen_messages, seen_messages: seen_messages, emptyRoom: emptyRoom, userid: req.session.user_id, group_id: group_id, room_user_id: room_user_id})
 })
 
-app.post('/group/invite/:person_name/:group_id', (req,res) => {
+
+app.get('/invite_person', (req,res) => {
+  res.render('inviteToGroup')
+})
+
+app.post('/group/:group_id/invite_to_group', (req,res) => {
   //add a person to the group. 
 })
 

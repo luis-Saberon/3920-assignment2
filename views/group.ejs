@@ -1,5 +1,6 @@
 <%- include("templates/header") %> 
 <table>
+  <% if(emptyRoom) { %>
    <% for(var i = 0; i < seen_messages.length; i++) { %>
     <tr>
       <td>Seen message: </td>
@@ -18,6 +19,9 @@
       <td><%= unseen_messages[i].message_id %></td>
       <td><%= unseen_messages[i].text %></td>
     </tr>  
+    <% } %>
+  <% } else { %>
+    <tr><td>No messages have been sent yet!</td></tr> 
     <% } %>
 </table>
 

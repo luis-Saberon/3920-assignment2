@@ -69,7 +69,7 @@ async function addPersonToGroup(group_id, user_id)
 {
   try{
     const results = await database.query(
-      'INSERT INTO room_user (room_id, user_id) VALUES = (?, ?)',
+      'INSERT INTO room_user (room_id, user_id) VALUES (?, ?)',
       [group_id, user_id]
     )
     console.log(results[0])
@@ -80,4 +80,21 @@ async function addPersonToGroup(group_id, user_id)
   }
 }
 
-module.exports = {getGroups, getMessagesInGroup, addMessageToGroup, updateLastSeenMessage, getLastSeenMessageId};
+async function makeGroup(user_id, group_name)
+{
+  try {
+    const result = await database.query(
+      'INSERT INTO room (name, start_datetime) VALUES (?, now())',
+      [group_name]
+    )
+    console.log(result)
+    const group_id = result[0].insertId
+    await addPersonToGroup(group_id, user_id)
+  } catch(err) {
+    console.log("ERROR IN MAKING GROUP")
+    console.log(err)
+    return false
+  }
+}
+
+module.exports = {getGroups, getMessagesInGroup, addMessageToGroup, updateLastSeenMessage, getLastSeenMessageId, makeGroup};

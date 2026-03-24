@@ -2,7 +2,17 @@
   <div class="message_info">
   <p class="username"><%= username %></p>
   <p><%= timestamp %></p>
-  <p><a>Add reaction</a></p>
+    <div class="emojis">
+      <form action="/react/<%= message_id %>" name="something" method="post">
+        
+        <input type="hidden" name="room_user_id" value="<%= room_user_id %>">
+        <input type="hidden" name="backlink" value="/group/<%= group_id %>/<%= room_user_id %>">
+        <input name="Emoji" type="submit" value="Laughing"></input>
+        <input name="Emoji" type="submit" value="Sad"></input>
+        <input name="Emoji" type="submit" value="Dog"></input>
+      </form>
+    </div>
+  </div>
   <p><%= message_id %></p>
   </div>
   <div class="message_text">

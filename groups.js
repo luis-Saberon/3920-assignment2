@@ -22,6 +22,33 @@ async function getGroups(user_id)
   }
 }
 
+async function addReaction(message_id, user_id, emoji_id)
+{
+try {
+  const results = await database.query(
+    `INSERT INTO message_reaction (message_id, emoji_id, user_id) VALUES (?,?,?)`,
+    [message_id, emoji_id, user_id]
+  ) 
+} catch(err) {
+  console.log("ERROR IN ADDING REACTION")
+  console.log(err);
+}
+}
+
+async function getEmojiIdFromName(emoji_name)
+{
+try {
+  const results = await database.query(
+    `SELECT emoji_id FROM emoji WHERE emoji_name = ?`,
+    [emoji_name]
+  )
+  return results[0][0].emoji_id;
+} catch(err)
+{
+  console.log('ERROR IN GETTING EMOJIID FROM NAME')
+  console.log(err);
+}
+}
 
 async function updateLastSeenMessage(room_user_id, message_id) {
   try {
@@ -72,7 +99,11 @@ async function getMessagesInGroup(group_id)
 {
   try {
     const results = await database.query(
-      'SELECT u.username, m.message_id, m.sent_datetime, m.text FROM room r INNER JOIN room_user ru ON r.room_id = ru.room_id INNER JOIN message m ON ru.room_user_id = m.room_user_id INNER JOIN user u ON ru.user_id = u.user_id WHERE r.room_id = ? ORDER BY m.sent_datetime ASC',[group_id]
+      `SELECT u.username, m.message_id, m.sent_datetime, m.text 
+      FROM room r INNER JOIN room_user ru ON r.room_id = ru.room_id 
+      INNER JOIN message m ON ru.room_user_id = m.room_user_id 
+      INNER JOIN user u ON ru.user_id = u.user_id 
+      WHERE r.room_id = ? ORDER BY m.sent_datetime ASC`,[group_id]
     )
     return results
   } catch(err) {
@@ -143,4 +174,4 @@ async function getUsersInGroup(group_id, user_id)
   }
 }
 
-module.exports = {getGroups, getMessagesInGroup, addMessageToGroup, updateLastSeenMessage, getLastSeenMessageId, makeGroup, addPersonToGroup, getUsersInGroup, checkIfUserInGroup};
+module.exports = {getGroups, getMessagesInGroup, addMessageToGroup, updateLastSeenMessage, getLastSeenMessageId, makeGroup, addPersonToGroup, getUsersInGroup, checkIfUserInGroup, getEmojiIdFromName, addReaction};

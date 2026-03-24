@@ -116,6 +116,15 @@ app.get('/group/:group_id/:room_user_id', async (req,res) => {
 }
 })
 
+app.post('/react/:message_id', async (req,res) => 
+{
+  const emoji_name = req.body.Emoji;
+  const message_id = req.params.message_id;
+  const user_id = req.session.user_id;
+  const emoji_id = await groups.getEmojiIdFromName(emoji_name);
+  groups.addReaction(message_id, user_id, emoji_id);
+  res.redirect(req.body.backlink)
+})
 
 app.get('/invite_person/:group_id/:room_user_id', async (req,res) => {
   if(!req.session.authenticated || !req.session.user_id)

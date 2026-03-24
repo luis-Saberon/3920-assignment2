@@ -3,7 +3,7 @@
 <button><a href="/groups">Go back to your groups</a></button>
   <% if(!emptyRoom) { %>
    <% for(var i = 0; i < seen_messages.length; i++) { %>
-      <%- include('templates/message', {username: seen_messages[i].username, timestamp: seen_messages[i].sent_datetime, text: seen_messages[i].text, message_id: seen_messages[i].message_id}) %>
+      <%- include('templates/message', {username: seen_messages[i].username, timestamp: seen_messages[i].sent_datetime, text: seen_messages[i].text, message_id: seen_messages[i].message_id, group_id: group_id, room_user_id: room_user_id}) %>
     <% } %>
     <% if(unseen_messages.length > 0) { %>
     <p>UNSEEN MESSAGES START HERE</p>

@@ -106,12 +106,14 @@ app.get('/group/:group_id/:room_user_id', async (req,res) => {
 })
 
 
-app.get('/invite_person', (req,res) => {
-  res.render('inviteToGroup')
+app.get('/invite_person/:group_id/:room_user_id', (req,res) => {
+  res.render('inviteToGroup',{group_id: req.params.group_id, room_user_id: req.params.room_user_id})
 })
 
-app.post('/group/:group_id/invite_to_group', (req,res) => {
-  //add a person to the group. 
+app.post('/invite_person/:group_id/:room_user_id', (req,res) => {
+  console.log(req.body.user_id)
+  groups.addPersonToGroup(req.params.group_id, req.body.user_id)
+  res.redirect(`/group/${req.params.group_id}/${req.params.room_user_id}`)
 })
 
 app.post('/message/:message_id/user/:user_id/emoji/:emoji_id', (req,res) => {

@@ -109,4 +109,4 @@ async function makeGroup(user_id, group_name)
   }
 }
 
-module.exports = {getGroups, getMessagesInGroup, addMessageToGroup, updateLastSeenMessage, getLastSeenMessageId, makeGroup};
+module.exports = {getGroups, getMessagesInGroup, addMessageToGroup, updateLastSeenMessage, getLastSeenMessageId, makeGroup, addPersonToGroup};

@@ -1,5 +1,6 @@
 <%- include("templates/header") %> 
-<button><a href="/invite_person">Invite person</a></button>
+<button><a href="/invite_person/<%= group_id %>/<%= room_user_id %>">Invite person</a></button>
+<button><a href="/groups">Go back to your groups</a></button>
 <table>
   <% if(!emptyRoom) { %>
    <% for(var i = 0; i < seen_messages.length; i++) { %>
@@ -23,4 +24,5 @@
   <textarea class="text"name="message" rows="2" cols="10" placeholder="Send a text to the group!" ></textarea>
   <button>Submit</button>
 </form>
+
 <%- include("templates/footer") %> 

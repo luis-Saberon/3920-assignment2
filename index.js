@@ -35,7 +35,9 @@ app.use(session({
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: false}));
-app.use( express.static( "public" ) );
+app.use(express.static(__dirname +  "/public" ));
+
+
 app.get('/', (req,res) => {
 
   if(req.session.authenticated)
@@ -94,12 +96,13 @@ app.get('/group/:group_id/:room_user_id', async (req,res) => {
         seen_messages.push(message_list[i])
       }
     }
-  
     const last_message = message_list[message_list.length - 1]
     const last_message_id = last_message.message_id;
     groups.updateLastSeenMessage(room_user_id, last_message_id)
   }
-  res.render('group', {unseen_messages: unseen_messages, seen_messages: seen_messages, emptyRoom: message_list > 0, userid: req.session.user_id, group_id: group_id, room_user_id: room_user_id})
+  console.log(message_list)
+  const emptyRoom = message_list.length == 0
+  res.render('group', {unseen_messages: unseen_messages, seen_messages: seen_messages, emptyRoom: emptyRoom, userid: req.session.user_id, group_id: group_id, room_user_id: room_user_id})
 })
 
 app.post('/group/invite/:person_name/:group_id', (req,res) => {

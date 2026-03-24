@@ -109,4 +109,23 @@ async function makeGroup(user_id, group_name)
   }
 }
 
-module.exports = {getGroups, getMessagesInGroup, addMessageToGroup, updateLastSeenMessage, getLastSeenMessageId, makeGroup, addPersonToGroup};
+async function getUsersInGroup(group_id, user_id)
+{
+  try{
+    const result = await database.query(
+      `SELECT u.email, u.username, u.user_id, r.room_id
+      FROM USER u
+      INNER JOIN room_user ru ON u.user_id = ru.user_id
+      INNER JOIN room r ON ru.room_id = r.room_id
+      WHERE r.room_id = ?`,
+    [group_id]
+    )
+    return result
+  } catch(err) {
+    console.log("ERROR IN GETTING USERS IN GROUP")
+    console.log(err)
+    return err
+  }
+}
+
+module.exports = {getGroups, getMessagesInGroup, addMessageToGroup, updateLastSeenMessage, getLastSeenMessageId, makeGroup, addPersonToGroup, getUsersInGroup};

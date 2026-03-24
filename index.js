@@ -106,8 +106,11 @@ app.get('/group/:group_id/:room_user_id', async (req,res) => {
 })
 
 
-app.get('/invite_person/:group_id/:room_user_id', (req,res) => {
-  res.render('inviteToGroup',{group_id: req.params.group_id, room_user_id: req.params.room_user_id})
+app.get('/invite_person/:group_id/:room_user_id', async (req,res) => {
+  const peopleInGroup = await groups.getUsersInGroup(req.params.group_id, req.session.user_id);
+  const peopleList = peopleInGroup[0]
+  console.log(peopleList);
+  res.render('inviteToGroup',{group_id: req.params.group_id, room_user_id: req.params.room_user_id, peopleList: peopleList})
 })
 
 app.post('/invite_person/:group_id/:room_user_id', (req,res) => {

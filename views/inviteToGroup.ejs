@@ -1,4 +1,7 @@
 <%- include("templates/header") %> 
+<% for(let i = 0; i < peopleList.length; i++) { %>
+    <p><%= peopleList[i].email %> <%= peopleList[i].username %> <%= peopleList[i].user_id%></p>
+<% } %>
 <form action="/invite_person/<%= group_id %>/<%= room_user_id %>" method="post">
   <input type="text" placeholder="Enter user id of the person you want to invite" name="user_id">
   <button>Submit</button>

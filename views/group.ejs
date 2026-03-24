@@ -1,25 +1,19 @@
 <%- include("templates/header") %> 
 <button><a href="/invite_person/<%= group_id %>/<%= room_user_id %>">Invite person</a></button>
 <button><a href="/groups">Go back to your groups</a></button>
-<table>
   <% if(!emptyRoom) { %>
    <% for(var i = 0; i < seen_messages.length; i++) { %>
-    <tr>
-      <%- include('templates/message', {username: seen_messages[i].username, timestamp: seen_messages[i].sent_datetime, text: seen_messages[i].text}) %>
-    </tr>  
+      <%- include('templates/message', {username: seen_messages[i].username, timestamp: seen_messages[i].sent_datetime, text: seen_messages[i].text, message_id: seen_messages[i].message_id}) %>
     <% } %>
     <% if(unseen_messages.length > 0) { %>
-    <tr><td>unseen messages</td></tr>
+    <p>UNSEEN MESSAGES START HERE</p>
     <% for(var i = 0; i < unseen_messages.length; i++) { %>
-    <tr>
-      <%- include('templates/message', {username: seen_messages[i].username, timestamp: seen_messages[i].sent_datetime, text: seen_messages[i].text}) %>
-    </tr>  
+      <%- include('templates/message', {username: unseen_messages[i].username, timestamp: unseen_messages[i].sent_datetime, text: unseen_messages[i].text, message_id: unseen_messages[i].message_id}) %>
     <% } %>
     <% } %>
   <% } else { %>
-    <tr><td>No messages have been sent yet!</td></tr> 
+    <p>No messages have been sent yet!</p>
     <% } %>
-</table>
 <form action="newMessage/room_user_id/<%= room_user_id %>" method="post">
   <textarea class="text"name="message" rows="2" cols="10" placeholder="Send a text to the group!" ></textarea>
   <button>Submit</button>

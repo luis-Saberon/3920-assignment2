@@ -51,15 +51,13 @@ app.get('/', (req,res) => {
 
 app.get('/groups', async (req,res) => {
   //get all the groups and display them in a list
-  if(!req.session.authenticated)
+  if(!req.session.authenticated || !req.session.user_id)
   {
     res.redirect('/')
   } else {
     const user_groups = await groups.getGroups(req.session.user_id)
     const user_groups_list = user_groups[0]
-    console.log(user_groups_list)
     res.render('groups', {groups: user_groups_list})
-    // res.redirect('/')
   }
 
 })
@@ -76,6 +74,12 @@ app.post('/new_group', (req,res) => {
 
 //displays all of the texts inside a group, reactions to those messages, and text area to send messages
 app.get('/group/:group_id/:room_user_id', async (req,res) => {
+    if(!req.session.authenticated || !req.session.user_id)
+  {
+    res.redirect('/')
+  } else {
+
+  
   let group_id = req.params.group_id
   const room_user_id = req.params.room_user_id
   const messages = await groups.getMessagesInGroup(group_id) //have a divider between seen messages and unseen messages (where message_id is greater than last seen message id)
@@ -84,15 +88,20 @@ app.get('/group/:group_id/:room_user_id', async (req,res) => {
   const unseen_messages = []
   if(message_list.length > 0)
   {
-    
-    const last_seen_message_id = groups.getLastSeenMessageId(room_user_id)
+    let last_seen_message_id = await groups.getLastSeenMessageId(room_user_id)
+    last_seen_message_id = last_seen_message_id[0][0].last_seen_message_id
+
     for(let i = 0; i < message_list.length; i++)
     {
       let message_id = message_list[i].message_id;
+      console.log(typeof message_id)
+      console.log(message_id > last_seen_message_id)
       if (message_id > last_seen_message_id)
       {
+        // console.log('adding to unseen list')
         unseen_messages.push(message_list[i])
       } else {
+        // console.log('adding to seen list')
         seen_messages.push(message_list[i])
       }
     }
@@ -100,21 +109,24 @@ app.get('/group/:group_id/:room_user_id', async (req,res) => {
     const last_message_id = last_message.message_id;
     groups.updateLastSeenMessage(room_user_id, last_message_id)
   }
-  console.log(message_list)
   const emptyRoom = message_list.length == 0
   res.render('group', {unseen_messages: unseen_messages, seen_messages: seen_messages, emptyRoom: emptyRoom, userid: req.session.user_id, group_id: group_id, room_user_id: room_user_id})
+}
 })
 
 
 app.get('/invite_person/:group_id/:room_user_id', async (req,res) => {
+  if(!req.session.authenticated || !req.session.user_id)
+  {
+    res.redirect('/')
+  } else {
   const peopleInGroup = await groups.getUsersInGroup(req.params.group_id, req.session.user_id);
   const peopleList = peopleInGroup[0]
-  console.log(peopleList);
   res.render('inviteToGroup',{group_id: req.params.group_id, room_user_id: req.params.room_user_id, peopleList: peopleList})
+  }
 })
 
 app.post('/invite_person/:group_id/:room_user_id', (req,res) => {
-  console.log(req.body.user_id)
   groups.addPersonToGroup(req.params.group_id, req.body.user_id)
   res.redirect(`/group/${req.params.group_id}/${req.params.room_user_id}`)
 })
@@ -127,10 +139,7 @@ app.post('/group/:group_id/newMessage/room_user_id/:room_user_id', (req,res) => 
   const message = req.body.message;
   const room_user_id = req.params.room_user_id;
   const group_id = req.params.group_id;
-  console.log(room_user_id)
-  console.log(group_id)
   const result = groups.addMessageToGroup(message, room_user_id)
-  console.log(message)
   res.redirect('/group/' + group_id + "/" + room_user_id)
 })
 
@@ -265,13 +274,11 @@ app.post('/loginPost', async (req,res) => {
   const result = await users.getUser(username);
   if(!result)
   {
-    console.log('somethings gone wrong')
     res.redirect('/login?databaseError=true')
   }else {
     if(result[0].length != 1)
     {
       res.redirect('/login?userNotFound=true')
-      console.log('result[0].lenght is the problem')
     }
 
     if(bcrypt.compareSync(password, result[0][0].password_hash))
@@ -285,7 +292,6 @@ app.post('/loginPost', async (req,res) => {
       
       res.redirect('/')
     } else {
-      console.log('bcrypt compare password is the problem')
       res.redirect("/login?userNotFound=true")
     }
   }
